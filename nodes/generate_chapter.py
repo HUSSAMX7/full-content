@@ -13,16 +13,22 @@ def generate_chapter(state: GraphState) -> dict:
     source_content = state["content"]
 
     system_prompt = (
-        "You are a specialist technical writer. Your task is to write one specific chapter "
-        "about a new topic, following the style of the reference document.\n\n"
+        "You are a specialist technical writer. Write one chapter for a new topic by learning "
+        "style and structure from the provided references.\n\n"
         "Strict rules:\n"
-        "1) Write only the requested chapter — do not write content from other chapters.\n"
-        "2) Length: approximately the same length as the equivalent chapter in the reference.\n"
-        "3) Do not add subheadings or bullet lists unless they are used in the reference for the same chapter type.\n"
-        "4) The reference document = a model for style and length only. Do not copy its content.\n"
-        "5) Write about the new topic only, in the same language as the reference.\n"
-        "6) Never mention the reference project.\n\n"
-        f"Reference document (for style and length only):\n{source_content}"
+        "1) Write only the requested chapter. Do not include other chapters.\n"
+        "2) The references are style/structure guides. Do not copy their project-specific content.\n"
+        "3) Keep the output about the new topic only, in the same language as the references.\n"
+        "4) If multiple references are provided, synthesize them into one coherent chapter.\n"
+        "5) Resolve conflicts by preferring the most context-relevant and repeated points.\n"
+        "6) Do not produce a shallow summary; maintain comparable depth to the reference chapter type.\n"
+        "7) Infer structure dynamically from relevant references: if references show multiple themes, "
+        "organize the chapter into clear numbered sub-sections; if not, keep it simpler.\n"
+        "8) Each sub-section should contain concrete, operational detail (processes, criteria, or examples), "
+        "not generic statements.\n"
+        "9) Use content from at least two source sections when possible, especially for overlapping themes.\n"
+        "10) Never mention the source file names, tags, or reference project identity in the final text.\n\n"
+        f"References:\n{source_content}"
     )
 
     user_prompt = (
@@ -32,8 +38,12 @@ def generate_chapter(state: GraphState) -> dict:
     if chapter_description:
         user_prompt += f"Chapter description: {chapter_description}\n"
     user_prompt += (
-        f"\nWrite only the content of the '{chapter_title}' chapter, matching the size and style "
-        "of the equivalent chapter in the reference. Do not write the full document — this chapter only."
+        f"\nTask:\n"
+        f"- Produce only the '{chapter_title}' chapter.\n"
+        "- First infer a suitable internal outline from the references, then write the final chapter.\n"
+        "- Keep depth comparable to the corresponding reference chapter type.\n"
+        "- Prefer synthesis over paraphrased summary.\n"
+        "- Do not output planning notes or outline drafts; output final chapter text only."
     )
 
     messages = [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]

@@ -41,12 +41,39 @@ def load_document(path: str) -> str:
 
 
 def run():
-    ref_path = r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\a.docx"
-    template_path = r"C:\Users\hosam\OneDrive\سطح المكتب\تمبلت.docx"
+    
+    ref_paths = [
+        r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\a.docx",
+        r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\b.docx",
+        r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\c.docx",
+    ]
+    print("Loading reference files...")
 
-    print("Loading reference file...")
-    content = load_document(ref_path)
-    print(f"Read {len(content)} characters from the reference.")
+    parts = []
+
+    for p in ref_paths:
+        if not os.path.exists(p):
+            print(f"Reference file not found: {p}")
+            continue
+        
+        file_text = load_document(p)
+
+        section = (
+            f"[SOURCE: {os.path.basename(p)}]\n"
+            f"{file_text}\n"
+            f"[END SOURCE: {os.path.basename(p)}]"
+        )
+        parts.append(section)
+
+    if not parts:
+        raise ValueError("No valid reference files were loaded.")
+
+    content = "\n\n" + ("-" * 80) + "\n\n"
+    content = content.join(parts)
+
+    print(f"Read {len(content)} characters from {len(parts)} reference files.")
+
+    template_path = r"C:\Users\hosam\OneDrive\سطح المكتب\تمبلت.docx"
 
     # Detect mode based on whether template file exists
     if os.path.exists(template_path):
@@ -56,7 +83,7 @@ def run():
     else:
         print("No template — using manual mode.")
         template_text = ""
-        mode = "manual"
+        mode = "template"
 
     initial_state = GraphState(
         content=content,

@@ -14,13 +14,15 @@ def refine_chapter(state: GraphState) -> dict:
     latest_feedback = state["feedback"][-1]
 
     system_prompt = (
-        "You are a specialist technical writer. Your task is to revise a chapter based on reviewer feedback.\n\n"
+        "You are a specialist technical writer. Revise one chapter based on reviewer feedback.\n\n"
         "Strict rules:\n"
         "1) Apply the reviewer's feedback precisely.\n"
-        "2) Preserve the same length — do not extend the chapter or add new sections.\n"
-        "3) Content must remain about the new topic only, not the reference document.\n"
-        "4) Write in the same language as the reference.\n\n"
-        f"Reference document (for style only):\n{source_content}"
+        "2) You may expand, condense, or restructure sections when needed to satisfy feedback.\n"
+        "3) Keep output focused on the new topic only, not the reference project.\n"
+        "4) Keep the same language as the references.\n"
+        "5) Preserve coherence and technical depth; avoid generic summary-style rewrites.\n"
+        "6) If the feedback asks for more detail, add concrete sub-sections/examples accordingly.\n\n"
+        f"References (style and structure only):\n{source_content}"
     )
 
     user_prompt = (
