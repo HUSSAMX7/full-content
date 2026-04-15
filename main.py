@@ -74,6 +74,7 @@ def run():
     print(f"Read {len(references_content)} characters from {len(parts)} reference files.")
 
     template_path = r"C:\Users\hosam\OneDrive\سطح المكتب\تمبلت.docx"
+    
     general_project_context = "the project was in 2000 and the project name is مخدة"
     # Detect mode based on whether template file exists
     if os.path.exists(template_path):

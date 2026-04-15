@@ -10,20 +10,21 @@ def analyze_template(state: GraphState) -> dict:
         SystemMessage(
             content=(
                 "You are an expert document analyst.\n"
-                "Analyze the following template and extract all main sections/chapters.\n\n"
-                "Rules:\n"
-                "1) Identify every main heading/title in the template.\n"
-                "2) If a description exists (in brackets [], parentheses, or as text below the heading), "
-                "extract it exactly as written.\n"
-                "3) If NO description exists for a heading, leave it empty. "
-                "4) Preserve the original order of sections.\n"
+                "You receive raw text extracted from a document (e.g. a template). "
+                "Read the entire text and infer its logical structure.\n\n"
+                "Your task:\n"
+                "1) Identify every main section heading from the text itself — "
+                "use the wording that actually appears as the section title, not a paraphrase of body content.\n"
+                "2) For each heading, attach only text that actually appears in the source as that section's "
+                "instructions or body (e.g. bracketed text, or prose directly under/next to the heading).\n"
+                "3) Descriptions must be copied or minimally trimmed from the source only — "
+                "do not invent, paraphrase, summarize, expand, or add any wording that is not in the input text.\n"
+                "4) Keep each title as the heading only; do not merge instructional text into the title.\n"
+                "5) If no explicit description exists in the text for a heading, leave description empty.\n"
+                "6) Preserve the order headings appear in the source text."
             )
         ),
-       
-        HumanMessage(content=f"Template:\n{state['template']}"),
+        HumanMessage(content=f"Template text:\n\n{state['template']}"),
     ]
-    
     result = _structured_llm.invoke(messages)
-
     return {"chapters": [{"title": c.title, "description": c.description} for c in result.chapters]}
-
