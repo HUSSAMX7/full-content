@@ -10,7 +10,8 @@ def generate_chapter(state: GraphState) -> dict:
     chapter_title = chapter["title"]
     chapter_description = chapter.get("description", "")
     topic = state["topic"]
-    source_content = state["content"]
+    references_content = state["references_content"]
+    general_project_context = state["general_project_context"]
 
     system_prompt = (
         "You are a specialist technical writer. Write one chapter for a new topic by learning "
@@ -28,12 +29,17 @@ def generate_chapter(state: GraphState) -> dict:
         "not generic statements.\n"
         "9) Use content from at least two source sections when possible, especially for overlapping themes.\n"
         "10) Never mention the source file names, tags, or reference project identity in the final text.\n\n"
-        f"References:\n{source_content}"
+        "11) References may include multiple samples. Always merge patterns across samples; do not rely on a single sample.\n"
+        "12)  \n"
+        
+        f"References:\n{references_content}"
+        f"General project context must be have information about the project name and details:\n{general_project_context}"
     )
 
     user_prompt = (
         f"New topic: {topic}\n"
         f"Chapter title: {chapter_title}\n"
+        f"General project context:\n{general_project_context}"
     )
     if chapter_description:
         user_prompt += f"Chapter description: {chapter_description}\n"

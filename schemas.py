@@ -8,3 +8,5 @@ class Chapter(BaseModel):
 
 class ChapterList(BaseModel):
     chapters: list[Chapter]
+
+

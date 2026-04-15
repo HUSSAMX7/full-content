@@ -1,3 +1,4 @@
+from .analyze_template import analyze_template
 from .approve_chapter import approve_chapter
 from .collect_chapters import collect_chapters
 from .collect_input import collect_input
@@ -10,11 +11,13 @@ from .routing import (
     route_after_chapters_review,
     route_after_collect_input,
     route_after_human_review,
+    route_entry,
 )
 from .save_output import save_output
 from .update_chapter import update_chapter
 
 __all__ = [
+    "analyze_template",
     "approve_chapter",
     "collect_chapters",
     "collect_input",
@@ -26,6 +29,7 @@ __all__ = [
     "route_after_chapters_review",
     "route_after_collect_input",
     "route_after_human_review",
+    "route_entry",
     "save_output",
     "update_chapter",
 ]

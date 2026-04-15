@@ -3,8 +3,9 @@ import operator
 
 
 class GraphState(TypedDict):
-    content: str
+    references_content: str
     template: str
+    general_project_context: str
     mode: str  # "template" or "manual"
     topic: str
     chapters: list[dict]

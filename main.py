@@ -68,13 +68,13 @@ def run():
     if not parts:
         raise ValueError("No valid reference files were loaded.")
 
-    content = "\n\n" + ("-" * 80) + "\n\n"
-    content = content.join(parts)
+    references_content = "\n\n" + ("-" * 80) + "\n\n"
+    references_content = references_content.join(parts)
 
-    print(f"Read {len(content)} characters from {len(parts)} reference files.")
+    print(f"Read {len(references_content)} characters from {len(parts)} reference files.")
 
     template_path = r"C:\Users\hosam\OneDrive\سطح المكتب\تمبلت.docx"
-
+    general_project_context = "the project was in 2000 and the project name is مخدة"
     # Detect mode based on whether template file exists
     if os.path.exists(template_path):
         print("Template found — using template mode.")
@@ -86,9 +86,10 @@ def run():
         mode = "template"
 
     initial_state = GraphState(
-        content=content,
+        references_content=references_content,
         template=template_text,
-        mode="manual",
+        general_project_context=general_project_context,
+        mode=mode,
         topic="",
         chapters=[],
         current_chapter_index=0,

@@ -10,7 +10,7 @@ def refine_chapter(state: GraphState) -> dict:
     chapter_title = chapter["title"]
     chapter_description = chapter.get("description", "")
     topic = state["topic"]
-    source_content = state["content"]
+    references_content = state["references_content"]
     latest_feedback = state["feedback"][-1]
 
     system_prompt = (
@@ -22,7 +22,7 @@ def refine_chapter(state: GraphState) -> dict:
         "4) Keep the same language as the references.\n"
         "5) Preserve coherence and technical depth; avoid generic summary-style rewrites.\n"
         "6) If the feedback asks for more detail, add concrete sub-sections/examples accordingly.\n\n"
-        f"References (style and structure only):\n{source_content}"
+        f"References (style and structure only):\n{references_content}"
     )
 
     user_prompt = (
