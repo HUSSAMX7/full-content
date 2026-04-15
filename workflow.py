@@ -18,6 +18,7 @@ from nodes import (
     route_after_human_review,
     save_output,
     update_chapter,
+    extract_chapter_samples,
 )
 
 checkpointer = InMemorySaver()
@@ -29,6 +30,7 @@ def create_workflow():
     workflow.add_node("analyze_template", analyze_template)
     workflow.add_node("collect_input", collect_input)
     workflow.add_node("collect_chapters", collect_chapters)
+    workflow.add_node("extract_chapter_samples", extract_chapter_samples)
     workflow.add_node("review_chapter", review_chapter)
     workflow.add_node("update_chapter", update_chapter)
     workflow.add_node("generate_chapter", generate_chapter)
@@ -63,11 +65,12 @@ def create_workflow():
         "review_chapter",
         route_after_chapters_review,
         {
-            "generate_chapter": "generate_chapter",
+            "generate_chapter": "extract_chapter_samples",
             "update_chapter": "update_chapter",
         },
     )
     workflow.add_edge("update_chapter", "review_chapter")
+    workflow.add_edge("extract_chapter_samples", "generate_chapter")
 
     # توليد → مراجعة بشرية → موافقة أو تحسين
     workflow.add_edge("generate_chapter", "human_review")
@@ -82,7 +85,7 @@ def create_workflow():
         "approve_chapter",
         route_after_approve,
         {
-            "generate_chapter": "generate_chapter",
+            "generate_chapter": "extract_chapter_samples",
             "save_output": "save_output",
         },
     )

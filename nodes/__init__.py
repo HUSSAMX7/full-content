@@ -15,7 +15,7 @@ from .routing import (
 )
 from .save_output import save_output
 from .update_chapter import update_chapter
-
+from .extract_chapter_samples import extract_chapter_samples
 __all__ = [
     "analyze_template",
     "approve_chapter",
@@ -32,4 +32,5 @@ __all__ = [
     "route_entry",
     "save_output",
     "update_chapter",
+    "extract_chapter_samples",
 ]

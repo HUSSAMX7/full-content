@@ -4,6 +4,7 @@ import operator
 
 class GraphState(TypedDict):
     references_content: str
+    chapter_samples: str
     template: str
     general_project_context: str
     mode: str  # "template" or "manual"
