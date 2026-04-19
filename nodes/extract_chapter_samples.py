@@ -10,6 +10,8 @@ def extract_chapter_samples(state: GraphState) -> dict:
     chapter_title = chapter["title"]
     chapter_description = chapter.get("description", "")
     references_content = state["references_content"]
+    if not references_content.strip():
+        return {"chapter_samples": ""}
 
     system_prompt = (
         "You extract only the relevant chapter text from multi-sample references.\n\n"

@@ -41,12 +41,17 @@ def load_document(path: str) -> str:
 
 
 def run():
-    
-    ref_paths = [
-        r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\a.docx",
-        r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\b.docx",
-        r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\c.docx",
-    ]
+
+    USE_REFERENCE_FILES = False # True to use reference files, False to use zero-data mode
+    ref_paths = (
+        [
+            r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\a.docx",
+            r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\b.docx",
+            r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\c.docx",
+        ]
+        if USE_REFERENCE_FILES
+        else []
+    )
     print("Loading reference files...")
 
     parts = []
@@ -64,33 +69,49 @@ def run():
             f"[END SOURCE: {os.path.basename(p)}]"
         )
         parts.append(section)
+    
+    has_references = len(parts) > 0
 
-    if not parts:
-        raise ValueError("No valid reference files were loaded.")
+    if has_references:
+        references_content = "\n\n" + ("-" * 80) + "\n\n"
+        references_content = references_content.join(parts)
 
-    references_content = "\n\n" + ("-" * 80) + "\n\n"
-    references_content = references_content.join(parts)
+        print(f"Read {len(references_content)} characters from {len(parts)} reference files.")
+    else:
 
-    print(f"Read {len(references_content)} characters from {len(parts)} reference files.")
+        references_content = ""
+        print("No references uploaded. Switching to zero-data mode.")
 
     template_path = r"C:\Users\hosam\OneDrive\سطح المكتب\تمبلت.docx"
     
-    general_project_context = "the project was in 2000 and the project name is مخدة"
+    general_project_context = "the project was in 2000 and the project name is وكيل"
+
+
+
     # Detect mode based on whether template file exists
-    if os.path.exists(template_path):
+    if  has_references and os.path.exists(template_path):
         print("Template found — using template mode.")
         template_text = load_document(template_path)
         mode = "template"
-    else:
-        print("No template — using manual mode.")
+    elif has_references:
+
+        print("No template, but references exist — using manual mode.")
         template_text = ""
-        mode = "template"
+        mode = "manual"
+    
+    else:
+        print("No references or template — using zero-data mode.")
+        template_text = ""
+        mode = "zero_data"
 
     initial_state = GraphState(
         references_content=references_content,
+        chapter_samples="",
         template=template_text,
         general_project_context=general_project_context,
         mode=mode,
+        doc_type="",
+        requested_chapter_count=0,
         topic="",
         chapters=[],
         current_chapter_index=0,
@@ -104,25 +125,30 @@ def run():
 
     while True:
         state = graph.get_state(config)
+        # Pending human-in-the-loop prompts live on state.interrupts (aggregated).
+        # After a resume, next can be empty while the same node still has another
+        # interrupt (e.g. collect_input asks topic, then type, then count) — do not
+        # treat that as "finished".
+        interrupts = tuple(state.interrupts) if state.interrupts else ()
+
+        if interrupts:
+            prompt_text = interrupts[0].value
+            print("\n" + "=" * 60)
+            print(prompt_text)
+            print("=" * 60)
+
+            user_input = input("\nYour reply: ").strip()
+            graph.invoke(
+                Command(resume=user_input),
+                config=config,
+            )
+            continue
 
         if not state.next:
             print("\nContent generation finished!")
             break
 
-        interrupts = state.tasks[0].interrupts if state.tasks else []
-        if not interrupts:
-            break
-
-        prompt_text = interrupts[0].value
-        print("\n" + "=" * 60)
-        print(prompt_text)
-        print("=" * 60)
-
-        user_input = input("\nYour reply: ").strip()
-        result = graph.invoke(
-            Command(resume=user_input),
-            config=config,
-        )
+        break
 
 
 if __name__ == "__main__":

@@ -20,8 +20,12 @@ def collect_chapters(state: GraphState) -> dict:
         SystemMessage(
             content=(
                 "Extract chapter titles from the user's input.\n"
-                "Each chapter has a title and an optional description in brackets [].\n"
-                "If no description exists, leave it empty."
+                "Rules:\n"
+                "1) Each numbered item or line is a separate chapter.\n"
+                "2) Infer the chapter title from the main subject of the line — do not copy the full line as the title.\n"
+                "3) Any extra detail or explanation in the same line becomes the description.\n"
+                "4) Never merge multiple lines into one chapter.\n"
+                "5) If no description exists, leave it empty."
             )
         ),
         HumanMessage(content=f"Topic: {topic}\nUser input:\n{response}"),

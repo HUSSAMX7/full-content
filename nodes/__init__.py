@@ -1,7 +1,7 @@
 from .analyze_template import analyze_template
 from .approve_chapter import approve_chapter
 from .collect_chapters import collect_chapters
-from .collect_input import collect_input
+from .collect_input import collect_topic, collect_doc_type, collect_chapter_count
 from .generate_chapter import generate_chapter
 from .human_review import human_review
 from .refine_chapter import refine_chapter
@@ -16,11 +16,14 @@ from .routing import (
 from .save_output import save_output
 from .update_chapter import update_chapter
 from .extract_chapter_samples import extract_chapter_samples
+from .propose_default_chapters import propose_default_chapters
 __all__ = [
     "analyze_template",
     "approve_chapter",
     "collect_chapters",
-    "collect_input",
+    "collect_topic",
+    "collect_doc_type",
+    "collect_chapter_count",
     "generate_chapter",
     "human_review",
     "refine_chapter",
@@ -33,4 +36,5 @@ __all__ = [
     "save_output",
     "update_chapter",
     "extract_chapter_samples",
+    "propose_default_chapters",
 ]

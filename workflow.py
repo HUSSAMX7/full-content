@@ -6,7 +6,9 @@ from nodes import (
     analyze_template,
     approve_chapter,
     collect_chapters,
-    collect_input,
+    collect_topic,
+    collect_doc_type,
+    collect_chapter_count,
     generate_chapter,
     human_review,
     refine_chapter,
@@ -19,6 +21,7 @@ from nodes import (
     save_output,
     update_chapter,
     extract_chapter_samples,
+    propose_default_chapters,
 )
 
 checkpointer = InMemorySaver()
@@ -28,7 +31,9 @@ def create_workflow():
     workflow = StateGraph(GraphState)
 
     workflow.add_node("analyze_template", analyze_template)
-    workflow.add_node("collect_input", collect_input)
+    workflow.add_node("collect_topic", collect_topic)
+    workflow.add_node("collect_doc_type", collect_doc_type)
+    workflow.add_node("collect_chapter_count", collect_chapter_count)
     workflow.add_node("collect_chapters", collect_chapters)
     workflow.add_node("extract_chapter_samples", extract_chapter_samples)
     workflow.add_node("review_chapter", review_chapter)
@@ -38,6 +43,8 @@ def create_workflow():
     workflow.add_node("approve_chapter", approve_chapter)
     workflow.add_node("refine_chapter", refine_chapter)
     workflow.add_node("save_output", save_output)
+    workflow.add_node("propose_default_chapters", propose_default_chapters)
+
 
     # START يقرر المسار: تمبلت أو مانيوال
     workflow.add_conditional_edges(
@@ -45,27 +52,36 @@ def create_workflow():
         route_entry,
         {
             "analyze_template": "analyze_template",
-            "collect_input": "collect_input",
+            "collect_topic": "collect_topic",
         },
     )
 
     # تمبلت → مراجعة المحاور مباشرة
     workflow.add_edge("analyze_template", "review_chapter")
 
-    # مانيوال → جمع المحاور → مراجعة
+    # الأسئلة الثلاثة بالترتيب
+    workflow.add_edge("collect_topic", "collect_doc_type")
+    workflow.add_edge("collect_doc_type", "collect_chapter_count")
+
+    # بعد جمع الفصول → مراجعة
     workflow.add_conditional_edges(
-        "collect_input",
+        "collect_chapter_count",
         route_after_collect_input,
-        {"collect_chapters": "collect_chapters"},
+        {
+            "collect_chapters": "collect_chapters",
+            "propose_default_chapters": "propose_default_chapters",
+        },
     )
     workflow.add_edge("collect_chapters", "review_chapter")
+    workflow.add_edge("propose_default_chapters", "review_chapter")
 
     # مراجعة المحاور → توليد أو تعديل
     workflow.add_conditional_edges(
         "review_chapter",
         route_after_chapters_review,
         {
-            "generate_chapter": "extract_chapter_samples",
+            "extract_chapter_samples": "extract_chapter_samples",
+            "generate_chapter": "generate_chapter",
             "update_chapter": "update_chapter",
         },
     )
@@ -85,7 +101,8 @@ def create_workflow():
         "approve_chapter",
         route_after_approve,
         {
-            "generate_chapter": "extract_chapter_samples",
+            "extract_chapter_samples": "extract_chapter_samples",
+            "generate_chapter": "generate_chapter",
             "save_output": "save_output",
         },
     )
