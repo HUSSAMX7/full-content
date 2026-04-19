@@ -20,4 +20,11 @@ def human_review(state: GraphState) -> dict:
     action = _classify_response(response)
     if action == "approve":
         return {"action": "approve"}
-    return {"action": "refine", "feedback": [response]}
+    if action == "regenerate":
+        return {
+            "action": "regenerate",
+            "raw_feedback": response,
+            "text_analysis": [],
+            "feedback_notes": [],
+        }
+    return {"action": "refine", "raw_feedback": response}

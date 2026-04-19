@@ -14,7 +14,12 @@ def route_after_collect_input(state: GraphState) -> str:
 
 
 def route_after_human_review(state: GraphState) -> str:
-    return "approve_chapter" if state["action"] == "approve" else "refine_chapter"
+    action = state["action"]
+    if action == "approve":
+        return "approve_chapter"
+    if action == "regenerate":
+        return "generate_chapter"
+    return "refine_chapter"
 
 
 def route_after_approve(state: GraphState) -> str:

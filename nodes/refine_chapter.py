@@ -11,33 +11,41 @@ def refine_chapter(state: GraphState) -> dict:
     chapter_description = chapter.get("description", "")
     topic = state["topic"]
     references_content = state["references_content"]
-    latest_feedback = state["feedback"][-1]
+    text_analysis = state.get("text_analysis", [])
+    feedback_notes = state.get("feedback_notes", [])
+
+    history_block = ""
+    if text_analysis:
+        history_block = "Revision history:\n"
+        for i, (ta, fn) in enumerate(zip(text_analysis, feedback_notes)):
+            history_block += (
+                f"\nRound {i+1}:\n"
+                f"  TEXT_ANALYSIS{i+1}: {ta}\n"
+                f"  FEEDBACK_NOTES{i+1}: {fn}\n"
+            )
+        history_block += "\n"
 
     system_prompt = (
-        "You are a specialist technical writer. Revise one chapter based on reviewer feedback.\n\n"
+        "You are a specialist technical writer. Revise one chapter based on a structured revision history.\n\n"
         "Strict rules:\n"
-        "1) Apply the reviewer's feedback precisely.\n"
-        "2) You may expand, condense, or restructure sections when needed to satisfy feedback.\n"
-        "3) Keep output focused on the new topic only, not the reference project.\n"
+        "1) Apply the LATEST feedback_notes precisely.\n"
+        "2) Do NOT undo any fix from previous rounds.\n"
+        "3) Keep output focused on the new topic only.\n"
         "4) Keep the same language as the references.\n"
-        "5) Preserve coherence and technical depth; avoid generic summary-style rewrites.\n"
-        "6) If the feedback asks for more detail, add concrete sub-sections/examples accordingly.\n\n"
+        "5) Preserve coherence and technical depth.\n\n"
         f"References (style and structure only):\n{references_content}"
     )
 
-    user_prompt = (
-        f"New topic: {topic}\n"
-        f"Chapter title: {chapter_title}\n"
-    )
+    user_prompt = f"New topic: {topic}\nChapter title: {chapter_title}\n"
     if chapter_description:
         user_prompt += f"Chapter description: {chapter_description}\n"
     user_prompt += (
-        f"\nCurrent draft:\n{state['draft']}\n\n"
-        f"Reviewer feedback:\n{latest_feedback}\n\n"
-        "Revise the chapter according to the feedback while preserving the same length and style."
+        f"\n{history_block}"
+        f"Current draft:\n{state['draft']}\n\n"
+        "Revise the chapter according to the latest feedback_notes "
+        "while preserving all previous corrections."
     )
 
     messages = [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
     response = llm.invoke(messages)
-    draft = f"# {chapter_title}\n\n{response.content}"
-    return {"draft": draft}
+    return {"draft": response.content}

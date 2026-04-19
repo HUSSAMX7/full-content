@@ -42,7 +42,7 @@ def load_document(path: str) -> str:
 
 def run():
 
-    USE_REFERENCE_FILES = False # True to use reference files, False to use zero-data mode
+    USE_REFERENCE_FILES = True # True to use reference files, False to use zero-data mode
     ref_paths = (
         [
             r"C:\Users\hosam\OneDrive\سطح المكتب\قياس\a.docx",
@@ -116,9 +116,11 @@ def run():
         chapters=[],
         current_chapter_index=0,
         draft="",
-        feedback=[],
         action="",
         generated_chapters=[],
+        text_analysis=[],
+        feedback_notes=[],
+        raw_feedback="",
     )
 
     result = graph.invoke(initial_state, config=config)

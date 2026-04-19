@@ -6,6 +6,7 @@ from .generate_chapter import generate_chapter
 from .human_review import human_review
 from .refine_chapter import refine_chapter
 from .review_chapter import review_chapter
+from .analyze_revision import analyze_revision
 from .routing import (
     route_after_approve,
     route_after_chapters_review,
@@ -17,6 +18,7 @@ from .save_output import save_output
 from .update_chapter import update_chapter
 from .extract_chapter_samples import extract_chapter_samples
 from .propose_default_chapters import propose_default_chapters
+
 __all__ = [
     "analyze_template",
     "approve_chapter",
@@ -28,6 +30,7 @@ __all__ = [
     "human_review",
     "refine_chapter",
     "review_chapter",
+    "analyze_revision",
     "route_after_approve",
     "route_after_chapters_review",
     "route_after_collect_input",

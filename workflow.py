@@ -22,6 +22,7 @@ from nodes import (
     update_chapter,
     extract_chapter_samples,
     propose_default_chapters,
+    analyze_revision,
 )
 
 checkpointer = InMemorySaver()
@@ -44,7 +45,7 @@ def create_workflow():
     workflow.add_node("refine_chapter", refine_chapter)
     workflow.add_node("save_output", save_output)
     workflow.add_node("propose_default_chapters", propose_default_chapters)
-
+    workflow.add_node("analyze_revision", analyze_revision)
 
     # START يقرر المسار: تمبلت أو مانيوال
     workflow.add_conditional_edges(
@@ -93,8 +94,15 @@ def create_workflow():
     workflow.add_conditional_edges(
         "human_review",
         route_after_human_review,
-        {"approve_chapter": "approve_chapter", "refine_chapter": "refine_chapter"},
+        {
+            "approve_chapter": "approve_chapter",
+            "refine_chapter": "analyze_revision",
+            "generate_chapter": "generate_chapter",
+        }
     )
+
+    workflow.add_edge("analyze_revision", "refine_chapter")
+
 
     # موافقة → الفصل الجاي أو الحفظ
     workflow.add_conditional_edges(

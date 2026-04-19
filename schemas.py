@@ -10,3 +10,5 @@ class ChapterList(BaseModel):
     chapters: list[Chapter]
 
 
+class ReviewDecision(BaseModel):
+    action: str  # "approve", "refine", or "regenerate"
